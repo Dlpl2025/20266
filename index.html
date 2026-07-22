@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M3U8 Video Player</title>
+    <!-- Include the latest hls.js library from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .player-wrapper {
+            width: 100%;
+            max-width: 800px;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="player-wrapper">
+    <video id="videoPlayer" controls></video>
+</div>
+
+<script>
+    const video = document.getElementById('videoPlayer');
+    
+    // REPLACE THIS URL with your own .m3u8 video link
+    const videoSrc = 'https://amg00416-amg00416c9-samsung-in-4882.playouts.now.amagi.tv/playlist/amg00416-travelxp-travelxphd-samsungin/playlist.m3u8';
+
+    // 1. Check for native HLS support (Safari, iOS, and some Android browsers)
+    if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = videoSrc;
+        video.addEventListener('loadedmetadata', () => {
+            // Uncomment the line below if you want autoplay (note: browsers often block unmuted autoplay)
+            // video.play(); 
+        });
+    } 
+    // 2. If native HLS is not supported, check if Hls.js is supported (Chrome, Firefox, Edge, etc.)
+    else if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(videoSrc);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            // Uncomment the line below if you want autoplay
+            // video.play();
+        });
+        
+        // Error handling
+        hls.on(Hls.Events.ERROR, (event, data) => {
+            if (data.fatal) {
+                console.error("A fatal error occurred with the video stream:", data);
+            }
+        });
+    } 
+    // 3. Fallback for very old browsers
+    else {
+        alert('Your browser does not support HLS playback.');
+    }
+</script>
+
+</body>
+</html>
