@@ -22,7 +22,7 @@
             --border-color: #ccc;
             --accent-color: #007bff;
         }
-
+ 
         * {
             margin: 0;
             padding: 0;
