@@ -3,77 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M3U8 Video Player</title>
-    <!-- Include the latest hls.js library from CDN -->
+    <title>LIVE VT Stream</title>
+    <!-- HLS.js প্লেয়ার লাইব্রেরি -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #1a1a1a;
+        /* সার্বিক ডিজাইন ও ব্যাকগ্রাউন্ড কালো করা */
+        * {
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #0b0b0b;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            padding: 20px;
         }
-        .player-wrapper {
+
+        /* লোগো সেকশন */
+        header {
+            margin-top: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .logo-img {
+            max-width: 250px; /* লোগোর সাইজ নিয়ন্ত্রণ করুন */
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* ভিডিও প্লেয়ার কন্টেইনার */
+        .video-container {
             width: 100%;
-            max-width: 800px;
-            background: #000;
-            border-radius: 8px;
+            max-width: 900px;
+            background: #161616;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            border: 1px solid #222; /* লোগোর নীল বর্ডারের সাথে মিলিয়ে সামান্য বর্ডার */
         }
         video {
             width: 100%;
             height: auto;
             display: block;
+            aspect-ratio: 16 / 9;
+            background: #000;
+        }
+
+        /* ফুটার বা নিচে ছোট বার্তা */
+        footer {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #666;
         }
     </style>
 </head>
 <body>
 
-<div class="player-wrapper">
-    <video id="videoPlayer" controls></video>
-</div>
+    <!-- ওপরের দিকে লোগো সেকশন -->
+    <header>
+        <img src="logo.png" alt="LIVE VT Logo" class="logo-img">
+    </header>
 
-<script>
-    const video = document.getElementById('videoPlayer');
-    
-    // REPLACE THIS URL with your own .m3u8 video link
-    const videoSrc = 'https://amg00416-amg00416c9-samsung-in-4882.playouts.now.amagi.tv/playlist/amg00416-travelxp-travelxphd-samsungin/playlist.m3u8';
+    <!-- ভিডিও প্লেয়ার সেকশন -->
+    <div class="video-container">
+        <video id="video" controls autoplay muted></video>
+    </div>
 
-    // 1. Check for native HLS support (Safari, iOS, and some Android browsers)
-    if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = videoSrc;
-        video.addEventListener('loadedmetadata', () => {
-            // Uncomment the line below if you want autoplay (note: browsers often block unmuted autoplay)
-            // video.play(); 
-        });
-    } 
-    // 2. If native HLS is not supported, check if Hls.js is supported (Chrome, Firefox, Edge, etc.)
-    else if (Hls.isSupported()) {
-        const hls = new Hls();
-        hls.loadSource(videoSrc);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            // Uncomment the line below if you want autoplay
-            // video.play();
-        });
-        
-        // Error handling
-        hls.on(Hls.Events.ERROR, (event, data) => {
-            if (data.fatal) {
-                console.error("A fatal error occurred with the video stream:", data);
-            }
-        });
-    } 
-    // 3. Fallback for very old browsers
-    else {
-        alert('Your browser does not support HLS playback.');
-    }
-</script>
+    <!-- ফুটার -->
+    <footer>
+        <p>&copy; 2026 LIVE VT Platform. All Rights Reserved.</p>
+    </footer>
+
+    <!-- జాভাস্ক্রিপ্ট কোড -->
+    <script>
+        var video = document.getElementById('video');
+        var videoSrc = 'https://hls-harbor-livepush.akamaized.net/live_cdn/nsqIStpj8PaG-Ev/emcQJ0pGpremocy/index.m3u8';
+
+        // ব্রাউজার সাপোর্ট চেক
+        if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = videoSrc;
+        } else if (Hls.isSupported()) {
+            var hls = new Hls();
+            hls.loadSource(videoSrc);
+            hls.attachMedia(video);
+        }
+    </script>
 
 </body>
 </html>
