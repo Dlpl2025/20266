@@ -7,7 +7,6 @@
     <!-- HLS.js প্লেয়ার লাইব্রেরি -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-        /* সার্বিক ডিজাইন ও ব্যাকগ্রাউন্ড কালো করা */
         * {
             margin: 0;
             padding: 0;
@@ -26,15 +25,48 @@
 
         /* লোগো সেকশন */
         header {
-            margin-top: 20px;
-            margin-bottom: 30px;
+            margin-top: 15px;
+            margin-bottom: 20px;
             text-align: center;
         }
         .logo-img {
-            max-width: 250px; /* লোগোর সাইজ নিয়ন্ত্রণ করুন */
+            max-width: 220px;
             height: auto;
             display: block;
             margin: 0 auto;
+        }
+
+        /* প্লেলিস্ট চ্যানেল সিলেকশন বক্স */
+        .playlist-box {
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #161616;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid #222;
+        }
+        .playlist-box label {
+            font-size: 14px;
+            color: #aaa;
+            font-weight: bold;
+        }
+        .playlist-box select {
+            background: #0b0b0b;
+            color: #fff;
+            border: 1px solid #333;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 70%;
+            cursor: pointer;
+            outline: none;
+        }
+        .playlist-box select:hover {
+            border-color: #ff416c;
         }
 
         /* ভিডিও প্লেয়ার কন্টেইনার */
@@ -45,7 +77,7 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-            border: 1px solid #222; /* লোগোর নীল বর্ডারের সাথে মিলিয়ে সামান্য বর্ডার */
+            border: 1px solid #222;
         }
         video {
             width: 100%;
@@ -55,7 +87,7 @@
             background: #000;
         }
 
-        /* ফুটার বা নিচে ছোট বার্তা */
+        /* ফুটার */
         footer {
             margin-top: 30px;
             font-size: 14px;
@@ -65,12 +97,59 @@
 </head>
 <body>
 
-    <!-- ওপরের দিকে লোগো সেকশন -->
+    <!-- লোগো -->
     <header>
         <img src="logo.png" alt="LIVE VT Logo" class="logo-img">
     </header>
 
-    <!-- ভিডিও প্লেয়ার সেকশন -->
+    <!-- চ্যানেল ড্রপডাউন মেনু -->
+    <div class="playlist-box">
+        <label for="channelSelect">Select Channel:</label>
+        <select id="channelSelect" onchange="changeChannel(this.value)">
+            <!-- নতুন যোগ করা চ্যানেলগুলো সবার ওপরে -->
+            <option value="https://amg00416-amg00416c9-samsung-in-4882.playouts.now.amagi.tv/playlist/amg00416-travelxp-travelxphd-samsungin/playlist.m3u8">Travel Xp</option>
+            <option value="https://d1g8wgjurz8via.cloudfront.net/bpk-tv/ColorsHD/default/ColorsHD.m3u8">ZEE Bangla Sonar / Colors HD</option>
+            
+            <!-- আগের ডিডি চ্যানেলগুলো -->
+            <option value="https://d2lk5u59tns74c.cloudfront.net/out/v1/308556d9fd1246adb479ef012a39bbfe/index.m3u8">DD Arun Prabha (360p)</option>
+            <option value="https://d2lk5u59tns74c.cloudfront.net/out/v1/d380bf5c167b4319a46cdd8204bc26b2/index.m3u8">DD Assam (504p)</option>
+            <option value="https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/7ff57cc9046b4c188b51a0d506f36e7f/index.m3u8">DD Bangla (504p)</option>
+            <option value="https://d2lk5u59tns74c.cloudfront.net/out/v1/67cec794d8b14f9ba21f73924ac65797/index.m3u8">DD Bharati (504p)</option>
+            <option value="https://d2lk5u59tns74c.cloudfront.net/out/v1/380b0765f87741a4812bc952ec6fbf21/index.m3u8">DD Bihar (504p)</option>
+            <option value="https://d2lk5u59tns74c.cloudfront.net/out/v1/0c980455d2fb4b69bcc6235745ee6039/index.m3u8">DD Chandana (504p)</option>
+            <option value="https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/5078083881bc489ea14f4c85e7abe4d6/index.m3u8">DD Chhattisgarh (504p)</option>
+            <option value="https://d2lk5u59tns74c.cloudfront.net/out/v1/558fdb9aebb54bb5bbbf0ced03686148/index.m3u8">DD Girnar (504p)</option>
+            <option value="https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/e5b9db1cc184406bb97159da2f120f91/index.m3u8">DD Goa (504p)</option>
+            <option value="https://d2lk5u59tns74c.cloudfront.net/out/v1/950fc69666474351bde0a32b9600c804/index.m3u8">DD Haryana (504p)</option>
+            <option value="https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/afd2e335b0ba40eb9bdf1096118c6ede/index.m3u8">DD Himachal Pradesh (504p)</option>
+            <option value="https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/ceda14583477426aa162a65392d8ea07/index.m3u8">DD India (1080p)</option>
+            <option value="https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/e8c3741f8c154d3185831f4e31777fb2/index.m3u8">DD Jharkhand (504p)</option>
+            <option value="https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/8a59a828e80c49d0958925950cec0204/index.m3u8">DD Kashir (504p)</option>
+            <option value="https://d2lk5u59tns74c.cloudfront.net/out/v1/4f053f2c12a24641bf701fb7f2376750/index.m3u8">DD Kisan (504p)</option>
+            <option value="https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/b5256b391a7c4ae6977535b73fd6f591/index.m3u8">DD Madhya Pradesh (504p)</option>
+            <option value="https://d2lk5u59tns74c.cloudfront.net/out/v1/c313674ffced4c9a90f1bba436df2b9b/index.m3u8">DD Malayalam (504p)</option>
+            <option value="https://d2lk5u59tns74c.cloudfront.net/out/v1/8b75afc6576f450e8f554b6c877681d2/index.m3u8">DD Manipur (504p)</option>
+            <option value="https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/4f81bc8d13dd49b484da35988abb8729/index.m3u8">DD Meghalaya (504p)</option>
+            <option value="https://d2lk5u59tns74c.cloudfront.net/out/v1/eea48c6b61074052a2fa8532ff795ff1/index.m3u8">DD Mizoram (504p)</option>
+            <option value="https://d2lk5u59tns74c.cloudfront.net/out/v1/29c92e0bef954a6d9b0908d1be29c1f0/index.m3u8">DD Nagaland (504p)</option>
+            <option value="https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/40492a64c1db4a1385ba1a397d357d3a/index.m3u8">DD National HD (1080p)</option>
+            <option value="https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/0811cd8c37ca4c409d5385a6cd2fa18b/index.m3u8">DD News HD (1080p)</option>
+            <option value="https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/ef4ea632b77a480ebd77106968aa99a9/index.m3u8">DD Odia (504p)</option>
+            <option value="https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/da821c24a59d4e57960497aeaca8fb33/index.m3u8">DD Punjabi (504p)</option>
+            <option value="https://d2lk5u59tns74c.cloudfront.net/out/v1/5b6bbbf682b741ecbe279f75a4a9a3e6/index.m3u8">DD Rajasthan (504p)</option>
+            <option value="https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/66dcc3ebe182447ba42837e746cf0c7c/index.m3u8">DD Sahyadri (504p)</option>
+            <option value="https://d2lk5u59tns74c.cloudfront.net/out/v1/26e915d6d12b4a06822c5e33c088ed56/index.m3u8">DD Saptagiri (504p)</option>
+            <option value="https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/b17adfe543354fdd8d189b110617cddd/index.m3u8">DD Sports SD (1080p)</option>
+            <option value="https://d2lk5u59tns74c.cloudfront.net/out/v1/abf46b14847e45499f4a47f3a9afe93d/index.m3u8">DD Tamil (1080p)</option>
+            <option value="https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/52b998e9510d41c29ad2ceca8ea3d849/index.m3u8">DD Tripura (504p)</option>
+            <option value="https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/9b91e9007e754db39a8b32c6bfc5b24a/index.m3u8">DD Urdu (504p)</option>
+            <option value="https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/70d4f6874fa64032a685e3123520f07d/index.m3u8">DD Uttar Pradesh (504p)</option>
+            <option value="https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/a70323c56ac647c2a8c8fc34e4c73912/index.m3u8">DD Uttarakhand (504p)</option>
+            <option value="https://d2lk5u59tns74c.cloudfront.net/out/v1/c89fa6d6f5864ac29670d6f91cb7e32a/index.m3u8">DD Yadagiri (504p)</option>
+        </select>
+    </div>
+
+    <!-- ভিডিও প্লেয়ার কন্টেইনার -->
     <div class="video-container">
         <video id="video" controls autoplay muted></video>
     </div>
@@ -80,19 +159,37 @@
         <p>&copy; 2026 LIVE VT Platform. All Rights Reserved.</p>
     </footer>
 
-    <!-- జాভাস্ক্রিপ্ট কোড -->
+    <!-- জাভাস্ক্রিপ্ট কোড -->
     <script>
         var video = document.getElementById('video');
-        var videoSrc = 'https://amg00416-amg00416c9-samsung-in-4882.playouts.now.amagi.tv/playlist/amg00416-travelxp-travelxphd-samsungin/playlist.m3u8';
+        var defaultSrc = document.getElementById('channelSelect').value;
+        var hls = null;
 
-        // ব্রাউজার সাপোর্ট চেক
-        if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            video.src = videoSrc;
-        } else if (Hls.isSupported()) {
-            var hls = new Hls();
-            hls.loadSource(videoSrc);
-            hls.attachMedia(video);
+        function playVideo(url) {
+            if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = url;
+                video.addEventListener('loadedmetadata', function() {
+                    video.play();
+                });
+            } else if (Hls.isSupported()) {
+                if (hls) {
+                    hls.destroy();
+                }
+                hls = new Hls();
+                hls.loadSource(url);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    video.play();
+                });
+            }
         }
+
+        function changeChannel(url) {
+            playVideo(url);
+        }
+
+        // পেজ ওপেন হওয়ার সাথে সাথে প্রথম চ্যানেল প্লে করা
+        playVideo(defaultSrc);
     </script>
 
 </body>
