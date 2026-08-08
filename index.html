@@ -22,6 +22,33 @@
             min-height: 100vh;
             padding: 20px;
         }
+        /* বাটন কন্টেইনারের ডিজাইন */
+.button-container {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* বাটনের ডিজাইন */
+.nav-btn {
+    flex: 1;
+    text-align: center;
+    background-color: #90ee90; /* লাইট গ্রিন কালার */
+    color: #000;
+    padding: 12px 0;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 6px;
+    transition: background 0.3s;
+}
+
+/* বাটন হোভার ইফেক্ট */
+.nav-btn:hover {
+    background-color: #7cfc00;
+}
 
         /* লোগো সেকশন */ 
         header {
@@ -154,6 +181,13 @@
     <div class="video-container">
         <video id="video" controls autoplay muted></video>
     </div>
+    <!-- বাটন সেকশন -->
+<div class="button-container">
+    <a href="https://www.kio.com" target="_blank" class="nav-btn">Button 1</a>
+    <a href="https://www.kio.com" target="_blank" class="nav-btn">Button 2</a>
+    <a href="https://www.kio.com" target="_blank" class="nav-btn">Button 3</a>
+    <a href="https://www.kio.com" target="_blank" class="nav-btn">Button 4</a>
+</div>
 
     <!-- ফুটার -->
     <footer>
