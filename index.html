@@ -163,26 +163,21 @@
     <!-- জাভাস্ক্রিপ্ট কোড -->
    <script>
         var video = document.getElementById('video');
-        var videoSrc = ';
+        var hls = new Hls();
 
-        // HLS.js সাপোর্ট চেক করা হচ্ছে
-        if (Hls.isSupported()) {
-            var hls = new Hls();
-            hls.loadSource(videoSrc);
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                video.play().catch(function(e) {
-                    console.log("Autoplay blocked, user interaction required.");
-                });
-            });
-        } 
-        // সাফারির মতো ব্রাউজারের জন্য নেটিভ সাপোর্ট
-        else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            video.src = videoSrc;
-            video.addEventListener('loadedmetadata', function() {
+        function changeChannel(url) {
+            if (Hls.isSupported()) {
+                hls.loadSource(url);
+                hls.attachMedia(video);
                 video.play();
-            });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = url;
+                video.play();
+            }
         }
+
+        // শুরুতে প্রথম চ্যানেল লোড করা
+        changeChannel(document.getElementById('channelSelect').value);
     </script>
 </body>
 </html>
