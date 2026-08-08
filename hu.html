@@ -83,16 +83,21 @@
     <!-- జాভাস্ক্রিপ্ট কোড -->
     <script>
         var video = document.getElementById('video');
-        var videoSrc = 'https://hls-harbor-livepush.akamaized.net/live_cdn/nsqIStpj8PaG-Ev/emcQJ0pGpremocy/index.m3u8';
+        var hls = new Hls();
 
-        // ব্রাউজার সাপোর্ট চেক
-        if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            video.src = videoSrc;
-        } else if (Hls.isSupported()) {
-            var hls = new Hls();
-            hls.loadSource(videoSrc);
-            hls.attachMedia(video);
+        function changeChannel(url) {
+            if (Hls.isSupported()) {
+                hls.loadSource(url);
+                hls.attachMedia(video);
+                video.play();
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = url;
+                video.play();
+            }
         }
+
+        // শুরুতে প্রথম চ্যানেল লোড করা
+        changeChannel(document.getElementById('channelSelect').value);
     </script>
 
 </body>
