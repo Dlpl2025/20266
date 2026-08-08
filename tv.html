@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web IPTV M3U Player</title>
+    <!-- Tailwind CSS for modern UI styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- HLS.js for playing HLS (.m3u8) streams in standard browsers -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-gray-800 border-b border-gray-700 p-4 shadow-md">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <h1 class="text-2xl font-bold text-blue-400">📺 Online IPTV Player</h1>
+            <div class="flex gap-4 w-full md:w-auto">
+                <!-- Search Input -->
+                <input type="text" id="searchInput" placeholder="Search channels..." 
+                    class="bg-gray-700 border border-gray-600 rounded px-4 py-2 focus:outline-none focus:border-blue-500 w-full md:w-64">
+                <!-- Country Filter Dropdown -->
+                <select id="countryFilter" class="bg-gray-700 border border-gray-600 rounded px-4 py-2 focus:outline-none focus:border-blue-500">
+                    <option value="">All Countries</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="container mx-auto p-4 flex-grow grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Video Player Section (Left/Top) -->
+        <div class="lg:col-span-2 flex flex-col gap-4">
+            <div class="relative bg-black rounded-lg overflow-hidden shadow-lg aspect-video flex items-center justify-center">
+                <video id="videoPlayer" controls autoplay class="w-full h-full"></video>
+                <div id="playerPlaceholder" class="absolute text-gray-400 text-center p-4">
+                    <p class="text-lg">Select a channel from the list to start watching</p>
+                </div>
+            </div>
+            <div class="bg-gray-800 p-4 rounded-lg shadow border border-gray-700">
+                <h2 id="currentChannelTitle" class="text-xl font-semibold text-blue-300">No Channel Selected</h2>
+                <p id="currentChannelMeta" class="text-sm text-gray-400 mt-1"></p>
+            </div>
+        </div>
+
+        <!-- Channel List Section (Right/Bottom) -->
+        <div class="bg-gray-800 rounded-lg shadow border border-gray-700 flex flex-col h-[600px]">
+            <div class="p-3 border-b border-gray-700 font-semibold text-gray-300 flex justify-between items-center">
+                <span>Channel List</span>
+                <span id="channelCount" class="text-xs bg-blue-600 px-2 py-1 rounded-full">0 channels</span>
+            </div>
+            <div id="channelList" class="overflow-y-auto flex-grow divide-y divide-gray-700">
+                <!-- Channels will be populated here via JavaScript -->
+                <div class="p-4 text-center text-gray-400">Loading playlists...</div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 border-t border-gray-700 text-center py-4 text-sm text-gray-400">
+        Powered by IPTV-Org &bull; Built with Tailwind & HLS.js
+    </footer>
+
+    <!-- Application Logic -->
+    <script>
+        const M3U_URL = "https://iptv-org.github.io/iptv/index.m3u";
+        
+        let allChannels = [];
+        const video = document.getElementById('videoPlayer');
+        const placeholder = document.getElementById('playerPlaceholder');
+        const channelListEl = document.getElementById('channelList');
+        const searchInput = document.getElementById('searchInput');
+        const countryFilter = document.getElementById('countryFilter');
+        const channelCountEl = document.getElementById('channelCount');
+        const currentTitleEl = document.getElementById('currentChannelTitle');
+        const currentMetaEl = document.getElementById('currentChannelMeta');
+
+        let hls = null;
+
+        // Fetch and parse M3U Playlist
+        async function loadPlaylist() {
+            try {
+                // Using a CORS proxy if necessary, or direct fetch if headers permit
+                const response = await fetch(M3U_URL);
+                const data = await response.text();
+                parseM3U(data);
+            } catch (error) {
+                console.error("Error fetching playlist:", error);
+                channelListEl.innerHTML = `<div class="p-4 text-center text-red-400">Failed to load playlist. Check CORS or network connection.</div>`;
+            }
+        }
+
+        function parseM3U(data) {
+            const lines = data.split('\n');
+            let channels = [];
+            let currentChannel = {};
+
+            for (let line of lines) {
+                line = line.trim();
+                if (line.startsWith('#EXTINF:')) {
+                    currentChannel = {};
+                    
+                    // Extract TVG Name / Channel Name
+                    let nameMatch = line.match(/tvg-name="([^"]*)"/);
+                    let logoMatch = line.match(/tvg-logo="([^"]*)"/);
+                    let countryMatch = line.match(/tvg-country="([^"]*)"/);
+                    
+                    // Fallback name extraction after the last comma
+                    let commaIndex = line.lastIndexOf(',');
+                    currentChannel.name = nameMatch ? nameMatch[1] : (commaIndex !== -1 ? line.substring(commaIndex + 1).trim() : "Unknown Channel");
+                    if (!currentChannel.name && commaIndex !== -1) {
+                        currentChannel.name = line.substring(commaIndex + 1).trim();
+                    }
+
+                    currentChannel.logo = logoMatch ? logoMatch[1] : '';
+                    currentChannel.country = countryMatch ? countryMatch.toUpperCase() : 'UNKNOWN';
+                } else if (line && !line.startsWith('#')) {
+                    currentChannel.url = line;
+                    if (currentChannel.url) {
+                        channels.push(currentChannel);
+                    }
+                    currentChannel = {};
+                }
+            }
+
+            allChannels = channels;
+            populateCountries();
+            renderChannels(allChannels);
+        }
+
+        function populateCountries() {
+            const countries = [...new Set(allChannels.map(c => c.country))].sort();
+            countries.forEach(country => {
+                if (country && country !== 'UNKNOWN') {
+                    const option = document.createElement('option');
+                    option.value = country;
+                    option.textContent = country;
+                    countryFilter.appendChild(option);
+                }
+            });
+        }
+
+        function renderChannels(channels) {
+            channelListEl.innerHTML = '';
+            channelCountEl.textContent = `${channels.length} channels`;
+
+            if (channels.length === 0) {
+                channelListEl.innerHTML = `<div class="p-4 text-center text-gray-400">No channels found.</div>`;
+                return;
+            }
+
+            // Render top 100 results for performance optimization if the list is massive
+            const displayList = channels.slice(0, 150); 
+
+            displayList.forEach((channel, index) => {
+                const item = document.createElement('div');
+                item.className = "flex items-center gap-3 p-3 hover:bg-gray-700 cursor-pointer transition-colors";
+                
+                item.innerHTML = `
+                    <div class="w-10 h-10 bg-gray-700 rounded flex items-center justify-center overflow-hidden flex-shrink-0">
+                        ${channel.logo ? `<img src="${channel.logo}" alt="" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/40?text=TV'">` : '📺'}
+                    </div>
+                    <div class="overflow-hidden flex-grow">
+                        <p class="font-medium text-sm truncate text-gray-200">${channel.name}</p>
+                        <p class="text-xs text-gray-400">${channel.country}</p>
+                    </div>
+                `;
+
+                item.addEventListener('click', () => playChannel(channel));
+                channelListEl.appendChild(item);
+            });
+        }
+
+        function playChannel(channel) {
+            currentTitleEl.textContent = channel.name;
+            currentMetaEl.textContent = `Country: ${channel.country}`;
+            placeholder.style.display = 'none';
+
+            if (Hls.isSupported() && channel.url.includes('.m3u8')) {
+                if (hls) {
+                    hls.destroy();
+                }
+                hls = new Hls();
+                hls.loadSource(channel.url);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    video.play();
+                });
+            } else {
+                video.src = channel.url;
+                video.play();
+            }
+        }
+
+        // Filtering logic
+        function filterChannels() {
+            const query = searchInput.value.toLowerCase();
+            const selectedCountry = countryFilter.value;
+
+            const filtered = allChannels.filter(channel => {
+                const matchesSearch = channel.name.toLowerCase().includes(query);
+                const matchesCountry = selectedCountry === "" || channel.country === selectedCountry;
+                return matchesSearch && matchesCountry;
+            });
+
+            renderChannels(filtered);
+        }
+
+        searchInput.addEventListener('input', filterChannels);
+        countryFilter.addEventListener('change', filterChannels);
+
+        // Initialize App
+        loadPlaylist();
+    </script>
+</body>
+</html>
